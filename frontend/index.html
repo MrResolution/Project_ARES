@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project A.R.E.S. Command Center</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Quick Chart.js for trends -->
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar / Navigation -->
+        <nav class="sidebar">
+            <div class="logo">
+                <h1>A.R.E.S.</h1>
+                <p>Autonomous Sentinel</p>
+            </div>
+            <ul class="nav-links">
+                <li class="active"><a href="#">Dashboard</a></li>
+                <li><a href="#">Diagnostics</a></li>
+                <li><a href="#">Mission Logs</a></li>
+                <li><a href="#">Settings</a></li>
+            </ul>
+            <div class="system-status">
+                <div class="status-indicator online"></div>
+                <span>SYSTEM ONLINE</span>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="dashboard">
+            <header>
+                <h2>Mission Control: <span id="mission-time">00:00:00</span></h2>
+                <div class="header-actions">
+                    <button class="btn-danger" id="emergency-stop">EMERGENCY STOP</button>
+                    <button class="btn-primary" id="ai-scan">RUN AI SCAN</button>
+                </div>
+            </header>
+
+            <!-- Video Feed & Map Section -->
+            <section class="visuals-grid">
+                <div class="card video-feed">
+                    <h3>Live Visual Feed</h3>
+                    <div class="video-placeholder">
+                        <img id="cam-feed" src="placeholder_cam.jpg" alt="Waiting for Connection..." onerror="this.src='https://via.placeholder.com/640x480?text=NO+SIGNAL'">
+                        <div class="overlay">
+                            <span>CAM-01 [ACTIVE]</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card map-view">
+                    <h3>LiDAR Navigation Map</h3>
+                    <canvas id="lidarCanvas"></canvas>
+                </div>
+            </section>
+
+            <!-- Telemetry Grid -->
+            <section class="telemetry-grid">
+                <div class="card stat-card">
+                    <h4>Temperature</h4>
+                    <div class="value" id="val-temp">-- °C</div>
+                    <div class="trend up">▲ 2%</div>
+                </div>
+                <div class="card stat-card">
+                    <h4>Toxic Gas</h4>
+                    <div class="value" id="val-gas">-- ppm</div>
+                    <div class="trend flat">NORMAL</div>
+                </div>
+                <div class="card stat-card">
+                    <h4>Radiation</h4>
+                    <div class="value warning" id="val-rad">-- CPM</div>
+                    <div class="trend down">▼ 5%</div>
+                </div>
+                <div class="card stat-card">
+                    <h4>Pressure</h4>
+                    <div class="value" id="val-press">-- hPa</div>
+                    <div class="trend flat">STABLE</div>
+                </div>
+            </section>
+            
+            <!-- Analysis Log -->
+            <section class="analysis-log">
+                <h3>AI Predictive Analysis (Ollama Integ.)</h3>
+                <div class="log-console" id="ai-log">
+                    <p class="log-entry system">> Awaiting Telemetry Data...</p>
+                </div>
+            </section>
+
+            <!-- Controls -->
+            <section class="controls-panel">
+                 <div class="card">
+                    <h3>Rover Control</h3>
+                    <div class="d-pad">
+                        <button class="btn-ctrl up">W</button>
+                        <div class="mid-row">
+                            <button class="btn-ctrl left">A</button>
+                            <button class="btn-ctrl down">S</button>
+                            <button class="btn-ctrl right">D</button>
+                        </div>
+                    </div>
+                 </div>
+                 <div class="card">
+                     <h3>Arm Control</h3>
+                     <div class="slider-group">
+                         <label>Base</label> <input type="range" min="0" max="180" value="90">
+                         <label>Shoulder</label> <input type="range" min="0" max="180" value="90">
+                         <label>Elbow</label> <input type="range" min="0" max="180" value="90">
+                         <label>Gripper</label> <input type="range" min="0" max="100" value="0">
+                     </div>
+                 </div>
+            </section>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

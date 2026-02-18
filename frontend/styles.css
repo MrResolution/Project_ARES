@@ -1,0 +1,218 @@
+:root {
+    --bg-dark: #0f172a;
+    --bg-card: #1e293b;
+    --accent: #3b82f6;
+    --accent-glow: rgba(59, 130, 246, 0.5);
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --success: #22c55e;
+    --font-head: 'Orbitron', sans-serif;
+    --font-body: 'Outfit', sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    font-family: var(--font-body);
+    overflow: hidden; /* App-like feel */
+}
+
+.app-container {
+    display: flex;
+    height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 250px;
+    background: rgba(30, 41, 59, 0.8);
+    backdrop-filter: blur(10px);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.logo h1 {
+    font-family: var(--font-head);
+    color: var(--accent);
+    font-size: 2rem;
+    text-shadow: 0 0 10px var(--accent-glow);
+}
+
+.logo p {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+}
+
+.nav-links {
+    list-style: none;
+    margin-top: 40px;
+}
+
+.nav-links li {
+    margin-bottom: 10px;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: var(--text-muted);
+    display: block;
+    padding: 10px 15px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.nav-links li.active a, .nav-links a:hover {
+    background: var(--accent);
+    color: white;
+    box-shadow: 0 0 15px var(--accent-glow);
+}
+
+.system-status {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.status-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--success);
+    box-shadow: 0 0 10px var(--success);
+}
+
+/* Dashboard */
+.dashboard {
+    flex: 1;
+    padding: 20px 40px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header h2 {
+    font-family: var(--font-head);
+}
+
+.btn-primary, .btn-danger {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-family: var(--font-head);
+    cursor: pointer;
+    transition: transform 0.1s;
+}
+
+.btn-primary { background: var(--accent); color: white; }
+.btn-danger { background: var(--danger); color: white; }
+
+.btn-primary:active, .btn-danger:active { transform: scale(0.95); }
+
+/* Cards */
+.card {
+    background: var(--bg-card);
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.card h3 {
+    font-family: var(--font-head);
+    margin-bottom: 15px;
+    font-size: 1rem;
+    color: var(--text-muted);
+}
+
+/* Visuals Grid */
+.visuals-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+    height: 300px;
+}
+
+.video-placeholder {
+    width: 100%;
+    height: 100%;
+    background: #000;
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+}
+
+.video-placeholder img { width: 100%; height: 100%; object-fit: cover; }
+
+.video-placeholder .overlay {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(0,0,0,0.5);
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-family: var(--font-head);
+    font-size: 0.8rem;
+    color: var(--success);
+}
+
+/* Telemetry Grid */
+.telemetry-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+.stat-card {
+    text-align: center;
+}
+
+.stat-card h4 { color: var(--text-muted); margin-bottom: 5px; font-size: 0.9rem; }
+.stat-card .value { font-size: 2rem; font-weight: 600; font-family: var(--font-head); }
+.stat-card .trend { font-size: 0.8rem; margin-top: 5px; }
+
+.trend.up { color: var(--success); }
+.trend.down { color: var(--danger); }
+.trend.flat { color: var(--text-muted); }
+.value.warning { color: var(--warning); }
+
+/* Analysis Log */
+.log-console {
+    background: #000;
+    color: #0f0;
+    font-family: 'Courier New', monospace;
+    padding: 10px;
+    border-radius: 8px;
+    height: 100px;
+    overflow-y: auto;
+    font-size: 0.9rem;
+}
+
+/* Sidebar & Controls */
+.controls-panel {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 20px;
+}
+
+/* D-Pad */
+.d-pad { text-align: center; }
+.btn-ctrl { width: 50px; height: 50px; background: #334155; border: none; color: white; border-radius: 8px; margin: 2px; cursor: pointer; }
+.btn-ctrl:active { background: var(--accent); }
