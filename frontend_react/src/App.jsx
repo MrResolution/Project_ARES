@@ -1,48 +1,24 @@
-
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import TopNav from './components/TopNav';
-import StatCard from './components/StatCard';
-import TelemetryChart from './components/TelemetryChart';
-import VideoFeed from './components/VideoFeed';
-import Controls from './components/Controls';
-import AiWidget from './components/AiWidget';
+import DashboardPage from './pages/DashboardPage';
+import VisualsPage from './pages/VisualsPage';
+import ControlsPage from './pages/ControlsPage';
+import AssistantPage from './pages/AssistantPage';
 
-const Dashboard = styled.div`
+const AppContainer = styled.div`
   display: flex;
   flex-direction: column;
-  min-height: calc(100vh - 80px);
-  padding: 1.5rem 2rem;
-  gap: 1.5rem;
-  overflow-y: auto;
+  min-height: 100vh;
 `;
 
-const GridContainer = styled.div`
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 1.5rem;
+const ContentMain = styled.main`
+  display: flex;
+  flex-direction: column;
   flex: 1;
-  min-height: 0; 
-`;
-
-const LeftColumn = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  min-height: 0;
-`;
-
-const RightColumn = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  min-height: 0;
-`;
-
-const StatGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1rem;
+  padding: 1.5rem 2rem;
+  overflow-y: auto;
 `;
 
 const API_URL = "http://localhost:5000/api";
@@ -64,7 +40,7 @@ function App() {
       setHistory(prev => {
         const newHistory = { ...prev };
         ['temp', 'gas', 'radiation', 'pressure'].forEach(key => {
-          const val = data[key === 'rad' ? 'radiation' : key]; // mapping check
+          const val = data[key === 'rad' ? 'radiation' : key];
           if (val !== undefined) {
             newHistory[key === 'radiation' ? 'rad' : key] = [...prev[key === 'radiation' ? 'rad' : key], val].slice(-30);
           }
@@ -83,64 +59,30 @@ function App() {
   }, []);
 
   return (
-    <>
-      <TopNav systemStatus={systemStatus} />
-      <Dashboard>
-        {/* Stat Cards Row */}
-        <StatGrid>
-          <StatCard
-            title="Temperature"
-            value={telemetry?.temp?.toFixed(1)}
-            unit="°C"
-            icon="🌡️"
-            trend="up"
-            trendValue="2%"
-          />
-          <StatCard
-            title="Toxic Gas"
-            value={telemetry?.gas?.toFixed(0)}
-            unit="ppm"
-            icon="☁️"
-            trend="flat"
-            trendValue="0%"
-          />
-          <StatCard
-            title="Radiation"
-            value={telemetry?.radiation?.toFixed(1)}
-            unit="CPM"
-            icon="☢️"
-            status={telemetry?.radiation > 14 ? 'warning' : ''}
-            trend="down"
-            trendValue="5%"
-          />
-          <StatCard
-            title="Pressure"
-            value={telemetry?.pressure?.toFixed(1)}
-            unit="hPa"
-            icon="🔵"
-            trend="flat"
-            trendValue="STABLE"
-          />
-        </StatGrid>
-
-        <GridContainer>
-          <LeftColumn>
-            <TelemetryChart
-              data={history[activeMetric]}
-              activeMetric={activeMetric}
-              onMetricChange={setActiveMetric}
+    <BrowserRouter>
+      <AppContainer>
+        <TopNav systemStatus={systemStatus} />
+        <ContentMain>
+          <Routes>
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route
+              path="/dashboard"
+              element={
+                <DashboardPage
+                  telemetry={telemetry}
+                  history={history}
+                  activeMetric={activeMetric}
+                  setActiveMetric={setActiveMetric}
+                />
+              }
             />
-            <VideoFeed />
-            <Controls />
-          </LeftColumn>
-
-          <RightColumn>
-            <AiWidget />
-          </RightColumn>
-        </GridContainer>
-
-      </Dashboard>
-    </>
+            <Route path="/visuals" element={<VisualsPage />} />
+            <Route path="/controls" element={<ControlsPage />} />
+            <Route path="/assistant" element={<AssistantPage />} />
+          </Routes>
+        </ContentMain>
+      </AppContainer>
+    </BrowserRouter>
   );
 }
 

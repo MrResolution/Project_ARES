@@ -1,5 +1,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
+import { BarChart3, ArrowUpToLine, Zap, Bell } from 'lucide-react';
 import './AiWidget.css';
 
 const AiWidget = () => {
@@ -60,16 +61,16 @@ const AiWidget = () => {
 
             <div className="quick-actions">
                 <button className="action-btn" onClick={() => handleQuickAction('report')}>
-                    📊 Env Report
+                    <BarChart3 size={18} /> Env Report
                 </button>
                 <button className="action-btn highlight" onClick={() => handleQuickAction('readings')}>
-                    🔝 Top Readings
+                    <ArrowUpToLine size={18} /> Top Readings
                 </button>
                 <button className="action-btn" onClick={() => handleQuickAction('anomaly')}>
-                    ⚡ Anomalies
+                    <Zap size={18} /> Anomalies
                 </button>
                 <button className="action-btn" onClick={() => handleQuickAction('alert')}>
-                    🔔 Alerts
+                    <Bell size={18} /> Alerts
                 </button>
             </div>
 
