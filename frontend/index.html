@@ -1,98 +1,186 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Project A.R.E.S. Command Center</title>
+    <meta name="description"
+        content="Project A.R.E.S. — Autonomous Rover for Environmental Surveillance. Real-time mission control dashboard.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Outfit:wght@300;400;600;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Quick Chart.js for trends -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
     <div class="app-container">
-        <!-- Sidebar / Navigation -->
-        <nav class="sidebar">
-            <div class="logo">
-                <h1>A.R.E.S.</h1>
-                <p>Autonomous Sentinel</p>
+        <!-- ===== TOP NAVIGATION ===== -->
+        <nav class="top-nav">
+            <div class="nav-left">
+                <div class="logo">
+                    <div class="logo-icon">🛰️</div>
+                    <h1>A.R.E.S.</h1>
+                </div>
+                <ul class="nav-links">
+                    <li class="active"><a href="#">Dashboard</a></li>
+                    <li><a href="#">Diagnostics</a></li>
+                    <li><a href="#">Mission Logs</a></li>
+                    <li><a href="#">Settings</a></li>
+                </ul>
             </div>
-            <ul class="nav-links">
-                <li class="active"><a href="#">Dashboard</a></li>
-                <li><a href="#">Diagnostics</a></li>
-                <li><a href="#">Mission Logs</a></li>
-                <li><a href="#">Settings</a></li>
-            </ul>
-            <div class="system-status">
-                <div class="status-indicator online"></div>
-                <span>SYSTEM ONLINE</span>
+            <div class="nav-right">
+                <div class="nav-date">
+                    <span class="icon">📅</span>
+                    <span id="nav-date-text">--</span>
+                </div>
+                <div class="status-badge">
+                    <span class="status-dot"></span>
+                    <span>SYSTEM ONLINE</span>
+                </div>
+                <button class="btn-action btn-danger" id="emergency-stop">⚠ EMERGENCY STOP</button>
+                <button class="btn-action btn-primary" id="ai-scan">🔍 RUN AI SCAN</button>
             </div>
         </nav>
 
-        <!-- Main Content -->
+        <!-- ===== MAIN DASHBOARD ===== -->
         <main class="dashboard">
-            <header>
-                <h2>Mission Control: <span id="mission-time">00:00:00</span></h2>
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="page-title-section">
+                    <h2>Mission Control</h2>
+                    <h1>Command Center<br>Overview</h1>
+                </div>
                 <div class="header-actions">
-                    <button class="btn-danger" id="emergency-stop">EMERGENCY STOP</button>
-                    <button class="btn-primary" id="ai-scan">RUN AI SCAN</button>
+                    <span style="font-size: 0.85rem; color: var(--text-muted);">Last updated : <span id="mission-time"
+                            style="color: var(--text-secondary);">00:00:00</span></span>
                 </div>
-            </header>
+            </div>
 
-            <!-- Video Feed & Map Section -->
-            <section class="visuals-grid">
-                <div class="card video-feed">
-                    <h3>Live Visual Feed</h3>
-                    <div class="video-placeholder">
-                        <img id="cam-feed" src="placeholder_cam.jpg" alt="Waiting for Connection..." onerror="this.src='https://via.placeholder.com/640x480?text=NO+SIGNAL'">
-                        <div class="overlay">
-                            <span>CAM-01 [ACTIVE]</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="card map-view">
-                    <h3>LiDAR Navigation Map</h3>
-                    <canvas id="lidarCanvas"></canvas>
-                </div>
-            </section>
-
-            <!-- Telemetry Grid -->
+            <!-- Telemetry Stat Cards -->
             <section class="telemetry-grid">
                 <div class="card stat-card">
+                    <div class="stat-icon">🌡️</div>
                     <h4>Temperature</h4>
                     <div class="value" id="val-temp">-- °C</div>
-                    <div class="trend up">▲ 2%</div>
+                    <div class="trend up">▲ 2% vs last scan</div>
                 </div>
                 <div class="card stat-card">
+                    <div class="stat-icon">☁️</div>
                     <h4>Toxic Gas</h4>
                     <div class="value" id="val-gas">-- ppm</div>
                     <div class="trend flat">NORMAL</div>
                 </div>
                 <div class="card stat-card">
+                    <div class="stat-icon">☢️</div>
                     <h4>Radiation</h4>
                     <div class="value warning" id="val-rad">-- CPM</div>
-                    <div class="trend down">▼ 5%</div>
+                    <div class="trend down">▼ 5% vs last scan</div>
                 </div>
                 <div class="card stat-card">
+                    <div class="stat-icon">🔵</div>
                     <h4>Pressure</h4>
                     <div class="value" id="val-press">-- hPa</div>
                     <div class="trend flat">STABLE</div>
                 </div>
             </section>
-            
-            <!-- Analysis Log -->
-            <section class="analysis-log">
-                <h3>AI Predictive Analysis (Ollama Integ.)</h3>
-                <div class="log-console" id="ai-log">
-                    <p class="log-entry system">> Awaiting Telemetry Data...</p>
+
+            <!-- Main Content Grid: Chart + AI Widget -->
+            <section class="content-grid">
+                <!-- Telemetry Chart Card -->
+                <div class="card chart-container">
+                    <div class="card-header">
+                        <div>
+                            <h3>Environmental Data</h3>
+                            <span class="card-title">Tracking telemetry</span>
+                        </div>
+                        <div class="chart-tabs">
+                            <button class="chart-tab active" data-chart="temp">Temp</button>
+                            <button class="chart-tab" data-chart="gas">Gas</button>
+                            <button class="chart-tab" data-chart="rad">Radiation</button>
+                        </div>
+                    </div>
+                    <div class="chart-legend">
+                        <div class="legend-item"><span class="legend-dot primary"></span> Current Reading</div>
+                        <div class="legend-item"><span class="legend-dot secondary"></span> Previous Scan</div>
+                    </div>
+                    <div class="chart-value-display">
+                        <span class="big-value" id="chart-big-value">--</span>
+                        <span class="change-badge" id="chart-change">+0%</span>
+                        <span class="subtext">vs last scan</span>
+                    </div>
+                    <canvas id="telemetryChart"></canvas>
+                </div>
+
+                <!-- AI Assistant Widget -->
+                <div class="card ai-widget">
+                    <div class="ai-greeting">
+                        <span class="label">Hi Commander</span>
+                        <h3>Can I help you?</h3>
+                    </div>
+                    <div class="ai-quick-actions">
+                        <button class="ai-action-btn" id="btn-env-report">
+                            <span class="action-icon">📊</span>
+                            <span>Environment report</span>
+                        </button>
+                        <button class="ai-action-btn highlighted" id="btn-top-readings">
+                            <span class="action-icon">🔝</span>
+                            <span>Top readings</span>
+                        </button>
+                        <button class="ai-action-btn" id="btn-anomaly">
+                            <span class="action-icon">⚡</span>
+                            <span>Anomaly detection</span>
+                        </button>
+                        <button class="ai-action-btn" id="btn-alert">
+                            <span class="action-icon">🔔</span>
+                            <span>Alert summary</span>
+                        </button>
+                    </div>
+                    <div class="ai-input-area">
+                        <input type="text" placeholder="Ask something to AI..." id="ai-input">
+                        <button class="ai-send-btn" id="ai-send">➤</button>
+                    </div>
+                    <div class="log-console" id="ai-log">
+                        <p class="log-entry system">> Awaiting Telemetry Data...</p>
+                    </div>
                 </div>
             </section>
 
-            <!-- Controls -->
+            <!-- Video Feed & Map Section -->
+            <p class="section-title">Live Sensors</p>
+            <section class="visuals-grid">
+                <div class="card video-feed">
+                    <div class="card-header">
+                        <div>
+                            <h3>Visual Feed</h3>
+                            <span class="card-title">Live Camera</span>
+                        </div>
+                    </div>
+                    <div class="video-placeholder">
+                        <img id="cam-feed" src="placeholder_cam.jpg" alt="Waiting for Connection..."
+                            onerror="this.src='https://via.placeholder.com/640x480/1a1108/e87b35?text=NO+SIGNAL'">
+                        <div class="overlay">CAM-01 [ACTIVE]</div>
+                    </div>
+                </div>
+                <div class="card map-view">
+                    <div class="card-header">
+                        <div>
+                            <h3>Navigation</h3>
+                            <span class="card-title">LiDAR Map</span>
+                        </div>
+                    </div>
+                    <canvas id="lidarCanvas"></canvas>
+                </div>
+            </section>
+
+            <!-- Controls Section -->
+            <p class="section-title">Rover Controls</p>
             <section class="controls-panel">
-                 <div class="card">
-                    <h3>Rover Control</h3>
+                <div class="card">
+                    <h3>Movement</h3>
                     <div class="d-pad">
                         <button class="btn-ctrl up">W</button>
                         <div class="mid-row">
@@ -101,19 +189,20 @@
                             <button class="btn-ctrl right">D</button>
                         </div>
                     </div>
-                 </div>
-                 <div class="card">
-                     <h3>Arm Control</h3>
-                     <div class="slider-group">
-                         <label>Base</label> <input type="range" min="0" max="180" value="90">
-                         <label>Shoulder</label> <input type="range" min="0" max="180" value="90">
-                         <label>Elbow</label> <input type="range" min="0" max="180" value="90">
-                         <label>Gripper</label> <input type="range" min="0" max="100" value="0">
-                     </div>
-                 </div>
+                </div>
+                <div class="card">
+                    <h3>Arm Control</h3>
+                    <div class="slider-group">
+                        <label>Base</label> <input type="range" min="0" max="180" value="90">
+                        <label>Shoulder</label> <input type="range" min="0" max="180" value="90">
+                        <label>Elbow</label> <input type="range" min="0" max="180" value="90">
+                        <label>Gripper</label> <input type="range" min="0" max="100" value="0">
+                    </div>
+                </div>
             </section>
         </main>
     </div>
     <script src="script.js"></script>
 </body>
+
 </html>
