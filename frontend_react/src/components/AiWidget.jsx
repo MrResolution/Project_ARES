@@ -18,14 +18,20 @@ const AiWidget = () => {
     const addMessage = (text, type = 'user') => {
         setMessages(prev => [...prev, { type, text }]);
 
-        // Simulate AI response
         if (type === 'user') {
-            setTimeout(() => {
-                setMessages(prev => [...prev, {
-                    type: 'ai',
-                    text: `> Processing query: "${text}"... \n> Analysis Complete: Nominal parameters observed.`
-                }]);
-            }, 1000);
+            (async () => {
+                try {
+                    const response = await fetch('http://localhost:5000/api/analyze', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ message: text })
+                    });
+                    const data = await response.json();
+                    setMessages(prev => [...prev, { type: 'ai', text: `> ${JSON.stringify(data)}` }]);
+                } catch (e) {
+                    setMessages(prev => [...prev, { type: 'ai', text: `> AI ENGINE OFFLINE — Connect backend for live analysis` }]);
+                }
+            })();
         }
     };
 

@@ -55,17 +55,8 @@ function App() {
 
   const fetchTelemetry = async () => {
     try {
-      // Mock fetch for now, replace with real API call
-      // const res = await fetch(`${API_URL}/status`);
-      // const data = await res.json();
-
-      // Simulate data randomly
-      const data = {
-        temp: 20 + Math.random() * 5,
-        gas: 100 + Math.random() * 20,
-        radiation: 10 + Math.random() * 5,
-        pressure: 1010 + Math.random() * 5
-      };
+      const res = await fetch(`${API_URL}/status`);
+      const data = await res.json();
 
       setSystemStatus('ONLINE');
       setTelemetry(data);
