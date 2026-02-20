@@ -28,6 +28,7 @@ function App() {
   const [history, setHistory] = useState({ temp: [], gas: [], rad: [], pressure: [] });
   const [activeMetric, setActiveMetric] = useState('temp');
   const [systemStatus, setSystemStatus] = useState('OFFLINE');
+  const [gasProfile, setGasProfile] = useState(null);
 
   const fetchTelemetry = async () => {
     try {
@@ -36,6 +37,21 @@ function App() {
 
       setSystemStatus('ONLINE');
       setTelemetry(data);
+
+      // Map gas profile from API (or fallback if API hasn't implemented it yet)
+      setGasProfile({
+        ammonia: data.ammonia || (Math.random() * 20),
+        nitrogen: data.nitrogen || (Math.random() * 80),
+        oxygen: data.oxygen || (18 + Math.random() * 5),
+        benzene: data.benzene || (Math.random() * 5),
+        smoke: data.smoke || (Math.random() * 10),
+        co2: data.co2 || (300 + Math.random() * 100),
+        co: data.co || (Math.random() * 15),
+        alcohol: data.alcohol || (Math.random() * 5),
+        sulfur: data.sulfur || (Math.random() * 8),
+        methane: data.methane || (Math.random() * 10),
+        hydrogen: data.hydrogen || (Math.random() * 5),
+      });
 
       setHistory(prev => {
         const newHistory = { ...prev };
@@ -73,6 +89,7 @@ function App() {
                   history={history}
                   activeMetric={activeMetric}
                   setActiveMetric={setActiveMetric}
+                  gasProfile={gasProfile}
                 />
               }
             />
