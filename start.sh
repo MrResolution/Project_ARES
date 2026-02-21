@@ -39,8 +39,7 @@ echo "[2/4] Starting Backend Server..."
 if lsof -i :5000 > /dev/null 2>&1; then
     echo "  ✓ Backend already running on port 5000"
 else
-    source "$BACKEND_DIR/venv/bin/activate"
-    python "$BACKEND_DIR/app.py" > "$BACKEND_DIR/backend_log.txt" 2>&1 &
+    "$BACKEND_DIR/venv/bin/python" "$BACKEND_DIR/app.py" > "$BACKEND_DIR/backend_log.txt" 2>&1 &
     BACKEND_PID=$!
     sleep 2
     if kill -0 $BACKEND_PID 2>/dev/null; then
@@ -55,8 +54,7 @@ echo "[3/4] Starting Object Identification..."
 if pgrep -f "object_identifier.py" > /dev/null 2>&1; then
     echo "  ✓ Object Identification already running"
 else
-    source "$BACKEND_DIR/venv/bin/activate"
-    python "$BACKEND_DIR/object_identifier.py" > "$BACKEND_DIR/object_id.log" 2>&1 &
+    "$BACKEND_DIR/venv/bin/python" "$BACKEND_DIR/object_identifier.py" > "$BACKEND_DIR/object_id.log" 2>&1 &
     OBJ_ID_PID=$!
     sleep 2
     if kill -0 $OBJ_ID_PID 2>/dev/null; then

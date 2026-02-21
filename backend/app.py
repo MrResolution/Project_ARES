@@ -8,6 +8,7 @@ import ollama
 import requests
 import threading
 import time
+import os
 
 app = Flask(__name__)
 CORS(app)
@@ -46,6 +47,17 @@ latest_data = {
 
 latest_objects = []
 
+LOG_FILE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "telemetry_history.jsonl")
+
+def log_telemetry(data):
+    try:
+        # Create a compact version for the log
+        log_entry = {k: v for k, v in data.items() if k not in ["gasProfile", "objects"]}
+        with open(LOG_FILE_PATH, 'a') as f:
+            f.write(json.dumps(log_entry) + '\n')
+    except Exception as e:
+        print(f"[LOG ERROR] {e}")
+
 def generate_gas_profile(raw_adc):
     """
     Derives estimated gas concentrations from a single MQ135 ADC reading (0-4095).
@@ -69,16 +81,16 @@ def generate_gas_profile(raw_adc):
     
     # MQ135 relative sensitivity ratios (from datasheet curves)
     return {
-        "co2":      round(ppm_base * 1.00 + random.uniform(-5, 5), 1),   # Primary target
-        "ammonia":  round(ppm_base * 0.70 + random.uniform(-3, 3), 1),   # High sensitivity
-        "benzene":  round(ppm_base * 0.35 + random.uniform(-2, 2), 1),   # Medium
-        "smoke":    round(ppm_base * 0.30 + random.uniform(-2, 2), 1),   # Medium
-        "alcohol":  round(ppm_base * 0.28 + random.uniform(-2, 2), 1),   # Medium
-        "nox":      round(ppm_base * 0.15 + random.uniform(-1, 1), 1),   # Low
-        "co":       round(ppm_base * 0.12 + random.uniform(-1, 1), 1),   # Low
-        "methane":  round(ppm_base * 0.10 + random.uniform(-1, 1), 1),   # Very low
-        "sulfur":   round(ppm_base * 0.08 + random.uniform(-1, 1), 1),   # Trace
-        "hydrogen": round(ppm_base * 0.06 + random.uniform(-1, 1), 1),   # Trace
+        "co2":      round(ppm_base * 1.00, 1),   # Primary target
+        "ammonia":  round(ppm_base * 0.70, 1),   # High sensitivity
+        "benzene":  round(ppm_base * 0.35, 1),   # Medium
+        "smoke":    round(ppm_base * 0.30, 1),   # Medium
+        "alcohol":  round(ppm_base * 0.28, 1),   # Medium
+        "nox":      round(ppm_base * 0.15, 1),   # Low
+        "co":       round(ppm_base * 0.12, 1),   # Low
+        "methane":  round(ppm_base * 0.10, 1),   # Very low
+        "sulfur":   round(ppm_base * 0.08, 1),   # Trace
+        "hydrogen": round(ppm_base * 0.06, 1),   # Trace
     }
 
 # ── Background Polling Thread ──
@@ -92,30 +104,39 @@ def poll_esp32():
             raw = resp.json()
 
             # Map ESP32 fields → dashboard fields
-            air_val = raw.get("air", 0)
+            def safe_float(val, default=0):
+                try:
+                    return float(val)
+                except (ValueError, TypeError):
+                    return default
+
+            air_val = safe_float(raw.get("air", 0))
             latest_data.update({
-                "temp": raw.get("temp", 0),
-                "pressure": raw.get("pressure", 0),
+                "temp": safe_float(raw.get("temp", 0)),
+                "pressure": safe_float(raw.get("pressure", 0)),
                 "gas": air_val,                     # MQ135/MQ139 → gas
-                "radiation": raw.get("flame", 0),   # flame sensor → radiation slot (legacy)
-                "flame": raw.get("flame", 0),       # flame sensor → flame card
-                "water": raw.get("water", 0),
-                "ax": round((raw.get("ax", 0) - AX_OFFSET) / ACCEL_SCALE, 4),
-                "ay": round((raw.get("ay", 0) - AY_OFFSET) / ACCEL_SCALE, 4),
-                "az": round((raw.get("az", 0) - AZ_OFFSET) / ACCEL_SCALE, 4),
-                "gx": raw.get("gx", 0),
-                "gy": raw.get("gy", 0),
-                "gz": raw.get("gz", 0),
-                "lat": raw.get("lat", 0),
-                "lng": raw.get("lng", 0),
+                "radiation": safe_float(raw.get("flame", 0)),   # flame sensor → radiation slot (legacy)
+                "flame": safe_float(raw.get("flame", 0)),       # flame sensor → flame card
+                "water": safe_float(raw.get("water", 0)),
+                "ax": round((safe_float(raw.get("ax", 0)) - AX_OFFSET) / ACCEL_SCALE, 4),
+                "ay": round((safe_float(raw.get("ay", 0)) - AY_OFFSET) / ACCEL_SCALE, 4),
+                "az": round((safe_float(raw.get("az", 0)) - AZ_OFFSET) / ACCEL_SCALE, 4),
+                "gx": safe_float(raw.get("gx", 0)),
+                "gy": safe_float(raw.get("gy", 0)),
+                "gz": safe_float(raw.get("gz", 0)),
+                "lat": safe_float(raw.get("lat", 0)),
+                "lng": safe_float(raw.get("lng", 0)),
                 "gasProfile": generate_gas_profile(air_val),
                 "timestamp": datetime.datetime.now().isoformat(),
                 "active": True,
                 "source": "esp32"
             })
+            log_telemetry(latest_data)
         except Exception as e:
-            print(f"[ESP32 Poll] Error: {e}")
+            # Only set active to False if the current source IS the ESP32
+            # or if we haven't received ANY data yet.
             latest_data["active"] = False
+            print(f"[ESP32 Poll] Offline: {e}")
         time.sleep(ESP32_POLL_INTERVAL)
 
 SYSTEM_PROMPT = """You are A.R.E.S., an AI assistant for an industrial rover mission-control system.
@@ -134,6 +155,7 @@ def receive_telemetry():
     data = request.json
     data['timestamp'] = datetime.datetime.now().isoformat()
     latest_data = data
+    log_telemetry(latest_data)
     
     # Check for immediate risks
     if ai.detect_fire_risk(data.get('temp', 0), data.get('gas', 0)):
@@ -144,6 +166,19 @@ def receive_telemetry():
 @app.route('/api/status', methods=['GET'])
 def get_status():
     return jsonify(latest_data)
+
+@app.route('/api/logs', methods=['GET'])
+def get_logs():
+    try:
+        limit = int(request.args.get('limit', 50))
+        if not os.path.exists(LOG_FILE_PATH):
+            return jsonify({"logs": []})
+        with open(LOG_FILE_PATH, 'r') as f:
+            lines = f.readlines()
+            logs = [json.loads(line) for line in lines[-limit:]]
+            return jsonify({"logs": logs})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/api/analyze', methods=['GET'])
 def analyze_status():
@@ -156,7 +191,7 @@ def analyze_status():
 @app.route('/api/sensor', methods=['GET'])
 def get_remote_sensor_data():
     """
-    Fetches sensor data from the remote device at 10.73.208.93.
+    Fetches sensor data from the remote device at 10.202.253.93.
     Expects the remote device to return JSON.
     """
     remote_url = "http://10.202.253.93/data" # Assuming /data endpoint, adjust if known
@@ -175,7 +210,7 @@ def ping_device():
     
     urls = {
         "sensor": "http://10.202.253.93/data",
-        "camera": "http://10.202.253.217:81/stream",
+        "camera": "http://10.202.2s53.217:81/stream",
     }
     
     url = urls.get(target)
@@ -326,10 +361,20 @@ def chat():
     history = body.get('history', [])
 
     # Build the messages array with system prompt + telemetry context
+    history_context = ""
+    try:
+        if os.path.exists(LOG_FILE_PATH):
+            with open(LOG_FILE_PATH, 'r') as f:
+                lines = f.readlines()
+                recent_logs = lines[-5:] # Last 5 entries
+                history_context = "\n\nRecent telemetry history (oldest to newest):\n" + "".join(recent_logs)
+    except:
+        pass
+
     telemetry_context = f"\n\nCurrent telemetry readings: {json.dumps(latest_data)}" if latest_data.get('timestamp') else ""
     
     messages = [
-        {"role": "system", "content": SYSTEM_PROMPT + telemetry_context}
+        {"role": "system", "content": SYSTEM_PROMPT + telemetry_context + history_context}
     ]
     
     # Add conversation history

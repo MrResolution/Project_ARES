@@ -12,7 +12,7 @@ import {
     Tooltip,
     Legend,
 } from 'chart.js';
-import { Bar, Radar } from 'react-chartjs-2';
+import { Line, Radar } from 'react-chartjs-2';
 import './TelemetryChart.css';
 
 ChartJS.register(
@@ -44,22 +44,24 @@ const TelemetryChart = ({ data, activeMetric, onMetricChange, gasProfile, pressu
         setGradient(grad);
     }, [activeMetric]);
 
-    const barData = {
+    const lineData = {
         labels: data.map((_, i) => i + 1),
         datasets: [
             {
                 label: 'Current',
                 data: data,
-                backgroundColor: gradient || 'rgba(232, 123, 53, 0.5)',
+                backgroundColor: 'rgba(232, 123, 53, 0.2)',
                 borderColor: 'rgba(232, 123, 53, 1)',
-                borderWidth: 1,
-                borderRadius: 4,
-                barPercentage: 0.6,
+                borderWidth: 2,
+                pointRadius: 3,
+                pointBackgroundColor: 'rgba(232, 123, 53, 1)',
+                fill: true,
+                tension: 0.4,
             },
         ],
     };
 
-    const barOptions = {
+    const lineOptions = {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
@@ -84,6 +86,7 @@ const TelemetryChart = ({ data, activeMetric, onMetricChange, gasProfile, pressu
                 grid: { color: 'rgba(255, 255, 255, 0.05)' },
                 ticks: { color: '#888', font: { family: 'Droid Sans Mono' } },
                 border: { display: false },
+                beginAtZero: true,
             },
         },
         animation: { duration: 500 },
@@ -191,7 +194,7 @@ const TelemetryChart = ({ data, activeMetric, onMetricChange, gasProfile, pressu
                 </div>
             );
         }
-        return <Bar ref={chartRef} data={barData} options={barOptions} />;
+        return <Line ref={chartRef} data={lineData} options={lineOptions} />;
     };
 
     return (

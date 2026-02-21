@@ -23,7 +23,15 @@ def generate_telemetry():
             "alcohol": round(random.uniform(10, 30), 1),
             "sulfur": round(random.uniform(1, 6), 1),
             "hydrogen": round(random.uniform(2, 12), 1)
-        }
+        },
+        "ax": int(random.uniform(-2000, 2000)), # Raw MPU6050 simulation
+        "ay": int(random.uniform(-2000, 2000)),
+        "az": int(random.uniform(14000, 18000)),
+        "gx": int(random.uniform(-500, 500)),
+        "gy": int(random.uniform(-500, 500)),
+        "gz": int(random.uniform(-500, 500)),
+        "active": True,
+        "source": "simulation"
     }
 
 print(f"Simulating ESP32 Rover... Sending data to {BACKEND_URL}")

@@ -7,8 +7,8 @@ const Container = styled.div`
   display: flex;
   gap: 1.5rem;
   flex: 1;
-  min-height: 500px;
-  max-height: 600px;
+  height: 100%;
+  min-height: 0;
 `;
 
 const VisualContainer = styled.div`

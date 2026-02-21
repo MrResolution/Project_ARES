@@ -1,35 +1,58 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import TopNav from './components/TopNav';
+import SideNav from './components/SideNav';
 import DashboardPage from './pages/DashboardPage';
 import VisualsPage from './pages/VisualsPage';
 import ControlsPage from './pages/ControlsPage';
 import AssistantPage from './pages/AssistantPage';
+import AdminPage from './pages/AdminPage';
 
 const AppContainer = styled.div`
   display: flex;
-  flex-direction: column;
+  flex-direction: row; /* Horizontal layout for Sidebar */
   min-height: 100vh;
+  background: #050505;
 `;
 
 const ContentMain = styled.main`
+  flex: 1;
   display: flex;
   flex-direction: column;
-  flex: 1;
-  padding: 1.5rem 2rem;
-  overflow-y: auto;
+  height: 100vh;
+  padding: 0.3rem 0.5rem; /* Phase II Ultra-slim margins */
+  overflow: hidden; /* Prevent scrolling */
+  position: relative;
 `;
 
 const API_URL = "http://localhost:5000/api";
 
 function App() {
   const [telemetry, setTelemetry] = useState(null);
-  const [history, setHistory] = useState({ temp: [], gas: [], rad: [], pressure: [], flame: [], water: [] });
+  const [history, setHistory] = useState({
+    temp: Array(30).fill(0),
+    gas: Array(30).fill(0),
+    rad: Array(30).fill(0),
+    pressure: Array(30).fill(0),
+    flame: Array(30).fill(0),
+    water: Array(30).fill(0)
+  });
   const [activeMetric, setActiveMetric] = useState('temp');
   const [systemStatus, setSystemStatus] = useState('OFFLINE');
   const [gasProfile, setGasProfile] = useState(null);
   const [objects, setObjects] = useState([]);
+  const [alerts, setAlerts] = useState([]);
+
+  const addAlert = (type, message) => {
+    const time = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    setAlerts(prev => {
+      // Don't add duplicate messages within the same minute
+      if (prev.length > 0 && prev[prev.length - 1].message === message) return prev;
+      return [...prev, { type, message, time }].slice(-20);
+    });
+  };
+
+  const clearAlerts = () => setAlerts([]);
 
   const fetchTelemetry = async () => {
     try {
@@ -70,6 +93,19 @@ function App() {
         return newHistory;
       });
 
+      // Monitor Thresholds for Alerts (Only if system is ACTIVE)
+      if (data.active) {
+        if (data.temp > 45) addAlert('critical', `Critical Temperature: ${data.temp.toFixed(1)}°C`);
+        else if (data.temp > 40) addAlert('warning', `High Temperature: ${data.temp.toFixed(1)}°C`);
+
+        // Trigger fire hazard from both Hardware Sensor AND Vision AI
+        const hasVisionFlame = data.objects && data.objects.some(obj => obj.label === 'FLAME' && obj.confidence > 0.6);
+        if (data.flame === 0 || hasVisionFlame) addAlert('critical', "OBJECT HAZARD DETECTED!");
+
+        if (data.gas > 800) addAlert('warning', "High Gas Levels Detected");
+        if (data.water > 400) addAlert('warning', "High Water Level Detected");
+      }
+
     } catch (e) {
       setSystemStatus('OFFLINE');
     }
@@ -83,7 +119,7 @@ function App() {
   return (
     <BrowserRouter>
       <AppContainer>
-        <TopNav systemStatus={systemStatus} />
+        <SideNav systemStatus={systemStatus} />
         <ContentMain>
           <Routes>
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
@@ -97,12 +133,15 @@ function App() {
                   setActiveMetric={setActiveMetric}
                   gasProfile={gasProfile}
                   systemStatus={systemStatus}
+                  alerts={alerts}
+                  onClearAlerts={clearAlerts}
                 />
               }
             />
             <Route path="/visuals" element={<VisualsPage objects={objects} />} />
             <Route path="/controls" element={<ControlsPage telemetry={telemetry} />} />
             <Route path="/assistant" element={<AssistantPage />} />
+            <Route path="/admin" element={<AdminPage />} />
           </Routes>
         </ContentMain>
       </AppContainer>

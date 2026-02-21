@@ -10,14 +10,67 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding-bottom: 0.5rem;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.live-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.live-dot.active {
+    background: #4caf50;
+    box-shadow: 0 0 8px #4caf50;
 }
 
 .feed-header h3 {
     margin: 0;
-    font-size: 1.1rem;
+    font-size: 0.9rem;
+    /* Reduced for consistency */
     font-weight: normal;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 2px;
+}
+
+.cam-toggle-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 8px;
+    background: rgba(76, 175, 80, 0.1);
+    border: 1px solid rgba(76, 175, 80, 0.2);
+    color: #4caf50;
+    font-family: inherit;
+    font-weight: bold;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.cam-toggle-btn:hover {
+    background: rgba(76, 175, 80, 0.2);
+    border-color: rgba(76, 175, 80, 0.4);
+}
+
+.cam-toggle-btn.disabled {
+    background: rgba(244, 67, 54, 0.1);
+    border-color: rgba(244, 67, 54, 0.2);
+    color: #f44336;
+}
+
+.cam-toggle-btn.disabled:hover {
+    background: rgba(244, 67, 54, 0.2);
+    border-color: rgba(244, 67, 54, 0.4);
 }
 
 .feed-controls {
@@ -118,6 +171,17 @@
     letter-spacing: 2px;
 }
 
+.cam-disabled-overlay {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    color: var(--text-secondary);
+    font-family: 'Droid Sans Mono', monospace;
+    letter-spacing: 3px;
+    font-size: 0.9rem;
+}
+
 .connecting-spinner {
     width: 36px;
     height: 36px;
@@ -209,9 +273,40 @@
     filter: drop-shadow(0 0 2px var(--accent-primary));
 }
 
+.detection-box.flame {
+    stroke: #ff3d00;
+    filter: drop-shadow(0 0 4px #ff3d00);
+    animation: box-pulse 1s infinite alternate;
+}
+
+.detection-box.smoke {
+    stroke: #cccccc;
+    filter: drop-shadow(0 0 2px rgba(200, 200, 200, 0.5));
+}
+
+@keyframes box-pulse {
+    from {
+        stroke-width: 0.005;
+        opacity: 0.8;
+    }
+
+    to {
+        stroke-width: 0.008;
+        opacity: 1;
+    }
+}
+
 .detection-label {
     fill: var(--accent-primary);
     font-family: 'Droid Sans Mono', monospace;
     font-weight: bold;
     text-shadow: 1px 1px 2px #000;
+}
+
+.detection-label.flame {
+    fill: #ff3d00;
+}
+
+.detection-label.smoke {
+    fill: #cccccc;
 }

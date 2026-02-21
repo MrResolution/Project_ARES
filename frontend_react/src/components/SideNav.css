@@ -1,0 +1,179 @@
+.side-nav {
+    width: 220px;
+    /* Slimmer sidebar */
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 1rem 0.75rem;
+    /* Tighter padding */
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(20px);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    position: sticky;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+}
+
+.nav-top {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    /* Reduced from 3rem */
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0 1rem;
+}
+
+.logo h1 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: 4px;
+    margin: 0;
+    background: linear-gradient(135deg, #fff 0%, rgba(255, 255, 255, 0.5) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.logo-icon {
+    width: 64px;
+    /* Maximized for brand impact */
+    height: 64px;
+}
+
+.nav-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.nav-links li a {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.8rem 1.2rem;
+    text-decoration: none;
+    color: var(--text-secondary);
+    border-radius: 12px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-weight: 500;
+    border: 1px solid transparent;
+}
+
+.nav-links li a:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+}
+
+.nav-links li a.active {
+    background: rgba(232, 123, 53, 0.1);
+    color: #e87b35;
+    border-color: rgba(232, 123, 53, 0.2);
+    box-shadow: 0 4px 20px rgba(232, 123, 53, 0.1);
+}
+
+.nav-links li a svg {
+    transition: transform 0.3s ease;
+}
+
+.nav-links li a.active svg {
+    transform: scale(1.1);
+}
+
+.nav-bottom {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.status-container {
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.status-badge-v {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #f44336;
+}
+
+.status-dot.online {
+    background: #4caf50;
+    box-shadow: 0 0 10px #4caf50;
+}
+
+.nav-date-v {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.nav-actions-v {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.glass-btn-v {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 0.8rem;
+    border-radius: 12px;
+    border: none;
+    font-family: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-danger-v {
+    background: rgba(244, 67, 54, 0.1);
+    color: #ff5252;
+    border: 1px solid rgba(244, 67, 54, 0.2);
+}
+
+.btn-danger-v:hover {
+    background: rgba(244, 67, 54, 0.2);
+    box-shadow: 0 0 20px rgba(244, 67, 54, 0.1);
+    transform: scale(1.02);
+}
+
+.btn-primary-v {
+    background: rgba(33, 150, 243, 0.1);
+    color: #448aff;
+    border: 1px solid rgba(33, 150, 243, 0.2);
+}
+
+.btn-primary-v:hover {
+    background: rgba(33, 150, 243, 0.2);
+    box-shadow: 0 0 20px rgba(33, 150, 243, 0.1);
+    transform: scale(1.02);
+}

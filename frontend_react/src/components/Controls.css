@@ -1,20 +1,15 @@
-.controls-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-    padding: 2rem;
-}
-
 .control-panel {
-    max-width: 600px;
     width: 100%;
-    padding: 2rem;
+    padding: 1rem;
+    /* Reduced from 1.5rem */
     display: flex;
     flex-direction: column;
-    gap: 2rem;
+    gap: 1rem;
+    /* Reduced from 1.5rem */
     position: relative;
     overflow: hidden;
+    height: 100%;
+    /* Ensure panels fill grid cells */
 }
 
 .control-panel.accent-border::before {
@@ -30,9 +25,11 @@
 .panel-header {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.5rem;
+    /* Reduced */
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    /* Reduced from 1rem */
 }
 
 .header-icon {
@@ -54,13 +51,15 @@
 .accel-display {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 0.75rem;
+    /* Reduced from 1.5rem */
 }
 
 .accel-axis {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.25rem;
+    /* Reduced from 0.5rem */
 }
 
 .axis-label {
@@ -78,7 +77,8 @@
 
 .axis-value {
     font-family: 'Droid Sans Mono', monospace;
-    font-size: 1.8rem;
+    font-size: clamp(1rem, 4vh, 1.4rem);
+    /* Responsive font size */
     font-weight: 700;
     color: var(--text-primary);
 }
@@ -106,8 +106,10 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 1rem;
-    padding-top: 1rem;
+    margin-top: 0.5rem;
+    /* Reduced from 1rem */
+    padding-top: 0.5rem;
+    /* Reduced from 1rem */
     border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 

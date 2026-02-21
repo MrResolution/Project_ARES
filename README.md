@@ -25,3 +25,22 @@ Industrial disasters and hazardous environments pose severe risks to human life 
 - `firmware/`: ESP32 and Arduino source code.
 - `backend/`: Python server and AI logic.
 - `frontend/`: Web dashboard for monitoring and control.
+
+## Getting Started
+
+### Prerequisites
+- Node.js
+- Python 3.x
+- Ollama (for local edge-AI features)
+
+### Running the Project
+The easiest way to launch the entire A.R.E.S. system (Backend, Frontend, AI, and Vision services) is to use the provided startup script:
+
+```bash
+./start.sh
+```
+
+Alternatively, to start all services including demo detectors:
+```bash
+./start_all.sh
+```

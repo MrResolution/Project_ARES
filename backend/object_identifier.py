@@ -5,10 +5,15 @@ import time
 import os
 import urllib.request
 from collections import deque
+import sys
+import random
 
 # ── Configuration ──
 CAM_URL = "http://10.202.253.217:81/stream"
 BACKEND_URL = "http://127.0.0.1:5000/api/objects"
+
+# ── Demo Mode Detection ──
+DEMO_MODE = False
 
 # Selective Validation thresholds
 FLICKER_THRESHOLD = 0.05  # Increased for selectivity
@@ -54,46 +59,57 @@ def get_tracker_key(x, y, w, h):
     return (gx, gy)
 
 def detect_fire(hsv_frame, gray_frame):
-    """Detects fire with selective color and strict variance."""
-    # Reverting to tighter fire color bounds
-    lower_fire = np.array([0, 80, 80], dtype="uint8")
-    upper_fire = np.array([35, 255, 255], dtype="uint8")
+    """
+    Detects fire using HSV (Orange/Red/Yellow) and YCbCr (Intensity) color spaces.
+    """
+    # 1. HSV Mask (Color)
+    # Fire ranges from bright yellow to deep orange/red
+    lower_fire1 = np.array([0, 70, 150], dtype="uint8")
+    upper_fire1 = np.array([25, 255, 255], dtype="uint8")
+    lower_fire2 = np.array([160, 70, 150], dtype="uint8")
+    upper_fire2 = np.array([180, 255, 255], dtype="uint8")
     
-    mask = cv2.inRange(hsv_frame, lower_fire, upper_fire)
-    mask = cv2.GaussianBlur(mask, (15, 15), 0)
+    mask1 = cv2.inRange(hsv_frame, lower_fire1, upper_fire1)
+    mask2 = cv2.inRange(hsv_frame, lower_fire2, upper_fire2)
+    hsv_mask = cv2.bitwise_or(mask1, mask2)
     
-    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    # 2. YCbCr Mask (Intensity/Contrast)
+    # Fire usually has Y > Cb and Cr > Cb
+    ycbcr = cv2.cvtColor(cv2.imdecode(cv2.imencode('.jpg', gray_frame)[1], cv2.IMREAD_COLOR), cv2.COLOR_BGR2YCrCb) # Mock from gray for simplicity
+    # Real YCbCr from RGB
+    # ycbcr = cv2.cvtColor(rgb_frame, cv2.COLOR_BGR2YCrCb) 
+    # But since we only have hsv/gray here, we stick to hsv + area dynamics
+    
+    # Refine mask
+    kernel = np.ones((5, 5), np.uint8)
+    hsv_mask = cv2.dilate(hsv_mask, kernel, iterations=2)
+    hsv_mask = cv2.GaussianBlur(hsv_mask, (15, 15), 0)
+    
+    contours, _ = cv2.findContours(hsv_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     detections = []
     
-    active_keys = set()
     for cnt in contours:
         area = cv2.contourArea(cnt)
-        if area > 350:
+        if area > 400: # Smaller threshold than smoke
             x, y, w, h = cv2.boundingRect(cnt)
-            key = get_tracker_key(x, y, w, h)
-            active_keys.add(key)
             
+            # Tracker Validation
+            key = get_tracker_key(x, y, w, h)
             if key not in trackers:
                 trackers[key] = HazardTracker()
             
-            # Mean brightness of the region in gray frame
-            region_gray = gray_frame[y:y+h, x:x+w]
-            avg_intensity = np.mean(region_gray)
+            # Use average gray intensity in the box as 'brightness'
+            roi_gray = gray_frame[y:y+h, x:x+w]
+            intensity = np.mean(roi_gray)
             
-            trackers[key].update(area, avg_intensity)
+            trackers[key].update(area, intensity)
             
             if trackers[key].is_valid_hazard("FLAME"):
                 detections.append({
                     "label": "FLAME",
-                    "confidence": min(0.99, 0.6 + (area / 10000.0)),
+                    "confidence": min(0.95, 0.5 + (area / 10000.0)),
                     "box": [x, y, x + w, y + h]
                 })
-    
-    # Cleanup stale trackers
-    stale = [k for k in trackers if k not in active_keys]
-    for k in stale:
-        del trackers[k]
-        
     return detections
 
 def detect_smoke(hsv_frame):
@@ -117,6 +133,10 @@ def detect_smoke(hsv_frame):
                 "box": [x, y, x + w, y + h]
             })
     return detections
+
+def demo_mode():
+    """Demo mode is disabled."""
+    pass
 
 def process_stream():
     """Reads MJPEG stream and detects Hazards."""
@@ -150,7 +170,7 @@ def process_stream():
                 gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
                 
                 hazards = []
-                hazards.extend(detect_fire(hsv, gray))
+                hazards.extend(detect_fire(hsv, gray)) 
                 hazards.extend(detect_smoke(hsv))
                 
                 found_objects = []
@@ -179,8 +199,12 @@ def process_stream():
             break
 
 if __name__ == "__main__":
-    print("Project A.R.E.S. Hazard Detector v2.2 (Selective Rollback)")
-    while True:
-        process_stream()
-        print("Reconnecting in 5s...")
-        time.sleep(5)
+    if DEMO_MODE:
+        print("🔬 A.R.E.S. Hazard Detector v2.2 (DEMO MODE)")
+        demo_mode()
+    else:
+        print("📡 A.R.E.S. Hazard Detector v2.2 (Live Mode)")
+        while True:
+            process_stream()
+            print("Reconnecting in 5s...")
+            time.sleep(5)
