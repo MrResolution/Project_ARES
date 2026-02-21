@@ -30,12 +30,12 @@ const API_URL = "http://localhost:5000/api";
 function App() {
   const [telemetry, setTelemetry] = useState(null);
   const [history, setHistory] = useState({
-    temp: Array(30).fill(0),
-    gas: Array(30).fill(0),
-    rad: Array(30).fill(0),
-    pressure: Array(30).fill(0),
-    flame: Array(30).fill(0),
-    water: Array(30).fill(0)
+    temp: [],
+    gas: [],
+    rad: [],
+    pressure: [],
+    flame: [],
+    water: []
   });
   const [activeMetric, setActiveMetric] = useState('temp');
   const [systemStatus, setSystemStatus] = useState('OFFLINE');

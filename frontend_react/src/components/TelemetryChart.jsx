@@ -45,7 +45,7 @@ const TelemetryChart = ({ data, activeMetric, onMetricChange, gasProfile, pressu
     }, [activeMetric]);
 
     const lineData = {
-        labels: data.map((_, i) => i + 1),
+        labels: data.map((_, i) => i + 1), // Dynamic label population up to 30
         datasets: [
             {
                 label: 'Current',
