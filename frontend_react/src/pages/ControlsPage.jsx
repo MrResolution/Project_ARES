@@ -19,28 +19,13 @@ const Container = styled.div`
 // PanelRow removed for Grid usage
 
 const ControlsPage = ({ telemetry }) => {
-<<<<<<< HEAD
   return (
     <Container>
-      <PanelRow>
-        <ServiceManager />
-      </PanelRow>
-
-      <PanelRow>
-        <Controls telemetry={telemetry} />
-        <PingTester />
-      </PanelRow>
+      <ServiceManager />
+      <Controls telemetry={telemetry} />
+      <GyroPanel telemetry={telemetry} />
     </Container>
   );
-=======
-    return (
-        <Container>
-            <ServiceManager />
-            <Controls telemetry={telemetry} />
-            <GyroPanel telemetry={telemetry} />
-        </Container>
-    );
->>>>>>> f62e861 (chore: Update README and commit recent changes)
 };
 
 export default ControlsPage;

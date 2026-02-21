@@ -2,30 +2,13 @@ import React from 'react';
 import styled from 'styled-components';
 import StatCard from '../components/StatCard';
 import TelemetryChart from '../components/TelemetryChart';
-<<<<<<< HEAD
 import GasRadarChart from '../components/GasRadarChart';
-import { Thermometer, CloudFog, Radio, Gauge, Flame, Droplets } from 'lucide-react';
+import AlertsPanel from '../components/AlertsPanel';
+import { Thermometer, CloudFog, Radio, Gauge, Target, Droplets } from 'lucide-react';
 
 const StatGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-`;
-
-const ContentArea = styled.div`
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 1.5rem;
-  flex: 1;
-  min-height: 400px;
-=======
-import AlertsPanel from '../components/AlertsPanel';
-import { Thermometer, CloudFog, Gauge, Target, Droplets } from 'lucide-react';
-
-const StatGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
   gap: 0.75rem; /* Ultra-compact gaps */
   flex: 0.8; /* Top row priority */
 `;
@@ -38,9 +21,11 @@ const DashboardWrapper = styled.div`
 `;
 
 const ContentArea = styled.div`
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.5rem;
   flex: 3.5; /* Large focus for the Telemetry History */
   min-height: 0;
->>>>>>> f62e861 (chore: Update README and commit recent changes)
 `;
 
 const BottomGrid = styled.div`
@@ -99,17 +84,10 @@ const SensorStatus = styled.span`
   border: 1px solid ${props => props.$danger ? 'rgba(244, 67, 54, 0.3)' : 'rgba(76, 175, 80, 0.3)'};
 `;
 
-<<<<<<< HEAD
-const DashboardPage = ({ telemetry, history, activeMetric, setActiveMetric, gasProfile, systemStatus }) => {
-  const isOffline = systemStatus === 'OFFLINE';
-  return (
-    <>
-=======
 const DashboardPage = ({ telemetry, history, activeMetric, setActiveMetric, gasProfile, systemStatus, alerts, onClearAlerts }) => {
   const isOffline = systemStatus === 'OFFLINE';
   return (
     <DashboardWrapper>
->>>>>>> f62e861 (chore: Update README and commit recent changes)
       <StatGrid>
         <StatCard
           title="Temperature"
@@ -121,7 +99,6 @@ const DashboardPage = ({ telemetry, history, activeMetric, setActiveMetric, gasP
           status={isOffline ? 'offline' : ''}
         />
         <StatCard
-<<<<<<< HEAD
           title="Toxic Gas"
           value={isOffline ? null : telemetry?.gas?.toFixed(0)}
           unit="ppm"
@@ -140,17 +117,6 @@ const DashboardPage = ({ telemetry, history, activeMetric, setActiveMetric, gasP
           trendValue={isOffline ? null : "5%"}
         />
         <StatCard
-=======
-          title="Air Quality"
-          value={isOffline ? null : telemetry?.gas?.toFixed(0)}
-          unit="ADC"
-          icon={<CloudFog size={20} />}
-          trend={isOffline ? null : "flat"}
-          trendValue={isOffline ? null : "RAW"}
-          status={isOffline ? 'offline' : ''}
-        />
-        <StatCard
->>>>>>> f62e861 (chore: Update README and commit recent changes)
           title="Pressure"
           value={isOffline ? null : telemetry?.pressure?.toFixed(1)}
           unit="hPa"
@@ -165,38 +131,23 @@ const DashboardPage = ({ telemetry, history, activeMetric, setActiveMetric, gasP
           data={history[activeMetric] || []}
           activeMetric={activeMetric}
           onMetricChange={setActiveMetric}
-<<<<<<< HEAD
-        />
-        <GasRadarChart gasData={gasProfile} />
-=======
           gasProfile={gasProfile}
           pressure={telemetry?.pressure}
         />
->>>>>>> f62e861 (chore: Update README and commit recent changes)
+        <GasRadarChart gasData={gasProfile} />
       </ContentArea>
       <BottomGrid>
         <SensorCard className="glass">
           <SensorIcon $danger={!isOffline && telemetry?.flame === 0}>
-<<<<<<< HEAD
-            <Flame size={28} />
-          </SensorIcon>
-          <SensorInfo>
-            <SensorLabel>Flame Sensor</SensorLabel>
-=======
             <Target size={28} />
           </SensorIcon>
           <SensorInfo>
             <SensorLabel>Object Detection</SensorLabel>
->>>>>>> f62e861 (chore: Update README and commit recent changes)
             <SensorValue>
               {isOffline ? '---' : (telemetry?.flame ?? '---')}
             </SensorValue>
             <SensorStatus $danger={!isOffline && telemetry?.flame === 0}>
-<<<<<<< HEAD
-              {isOffline ? 'OFFLINE' : (telemetry?.flame === 0 ? 'FLAME DETECTED' : 'CLEAR')}
-=======
               {isOffline ? 'OFFLINE' : (telemetry?.flame === 0 ? 'OBJECT DETECTED' : 'CLEAR')}
->>>>>>> f62e861 (chore: Update README and commit recent changes)
             </SensorStatus>
           </SensorInfo>
         </SensorCard>
@@ -214,14 +165,9 @@ const DashboardPage = ({ telemetry, history, activeMetric, setActiveMetric, gasP
             </SensorStatus>
           </SensorInfo>
         </SensorCard>
-<<<<<<< HEAD
-      </BottomGrid>
-    </>
-=======
         <AlertsPanel alerts={alerts} onClear={onClearAlerts} />
       </BottomGrid>
     </DashboardWrapper>
->>>>>>> f62e861 (chore: Update README and commit recent changes)
   );
 };
 
