@@ -51,27 +51,86 @@
     border-radius: 12px;
     overflow: hidden;
     position: relative;
-    min-height: 200px;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.feed-container img {
+.camera-view {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #000;
+}
+
+.camera-view img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
 
 .no-signal-overlay {
     position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
     color: var(--text-secondary);
     font-family: 'Droid Sans Mono', monospace;
     letter-spacing: 2px;
     background: rgba(0, 0, 0, 0.7);
-    padding: 8px 16px;
-    border-radius: 4px;
+    padding: 16px 24px;
+    border-radius: 8px;
     border: 1px solid rgba(255, 50, 50, 0.3);
+}
+
+.reconnect-btn {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--text-primary);
+    padding: 6px 16px;
+    border-radius: 16px;
+    cursor: pointer;
+    font-family: 'Droid Sans Mono', monospace;
+    font-size: 0.8rem;
+    transition: all 0.2s;
+    letter-spacing: 1px;
+}
+
+.reconnect-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(76, 175, 80, 0.5);
+    color: #4caf50;
+}
+
+.connecting-overlay {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    color: var(--text-secondary);
+    font-family: 'Droid Sans Mono', monospace;
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+}
+
+.connecting-spinner {
+    width: 36px;
+    height: 36px;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    border-top-color: #4caf50;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 .feed-status {
@@ -130,4 +189,29 @@
     to {
         transform: rotate(360deg);
     }
+}
+
+/* Detection Overlay Styles */
+.detection-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.detection-box {
+    fill: none;
+    stroke: var(--accent-primary);
+    stroke-width: 0.005;
+    filter: drop-shadow(0 0 2px var(--accent-primary));
+}
+
+.detection-label {
+    fill: var(--accent-primary);
+    font-family: 'Droid Sans Mono', monospace;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px #000;
 }

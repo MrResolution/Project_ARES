@@ -16,3 +16,8 @@ dist/
 *.elf
 *.bin
 *.hex
+
+# Logs
+*.log
+backend/backend_log.txt
+backend/test_run.log

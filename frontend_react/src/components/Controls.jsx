@@ -1,49 +1,60 @@
-
-import React, { useState } from 'react';
+import React from 'react';
 import './Controls.css';
+import { Activity } from 'lucide-react';
 
-const Controls = () => {
-    const [armValues, setArmValues] = useState({
-        base: 90,
-        shoulder: 90,
-        elbow: 90,
-        gripper: 0
-    });
-
-    const handleSliderChange = (joint, value) => {
-        setArmValues(prev => ({ ...prev, [joint]: value }));
+const Controls = ({ telemetry }) => {
+    const accel = {
+        x: telemetry?.ax || 0,
+        y: telemetry?.ay || 0,
+        z: telemetry?.az || 0
     };
 
     return (
         <div className="controls-container">
-            <div className="control-panel glass">
-                <h3>Rover Nav</h3>
-                <div className="d-pad">
-                    <button className="d-btn up">W</button>
-                    <div className="d-row">
-                        <button className="d-btn left">A</button>
-                        <button className="d-btn down">S</button>
-                        <button className="d-btn right">D</button>
+            <div className="control-panel glass accent-border">
+                <div className="panel-header">
+                    <Activity size={20} className="header-icon" />
+                    <h3>Bot Accelerometer</h3>
+                </div>
+
+                <div className="accel-display">
+                    <div className="accel-axis">
+                        <span className="axis-label">X-AXIS</span>
+                        <div className="axis-value-container">
+                            <span className="axis-value">{accel.x}</span>
+                            <span className="axis-unit">mg</span>
+                        </div>
+                        <div className="axis-progress-bg">
+                            <div className="axis-progress" style={{ width: `${Math.min(Math.abs(accel.x / 163.84), 100)}%`, background: 'var(--accent-primary)' }}></div>
+                        </div>
+                    </div>
+
+                    <div className="accel-axis">
+                        <span className="axis-label">Y-AXIS</span>
+                        <div className="axis-value-container">
+                            <span className="axis-value">{accel.y}</span>
+                            <span className="axis-unit">mg</span>
+                        </div>
+                        <div className="axis-progress-bg">
+                            <div className="axis-progress" style={{ width: `${Math.min(Math.abs(accel.y / 163.84), 100)}%`, background: '#4caf50' }}></div>
+                        </div>
+                    </div>
+
+                    <div className="accel-axis">
+                        <span className="axis-label">Z-AXIS</span>
+                        <div className="axis-value-container">
+                            <span className="axis-value">{accel.z}</span>
+                            <span className="axis-unit">mg</span>
+                        </div>
+                        <div className="axis-progress-bg">
+                            <div className="axis-progress" style={{ width: `${Math.min(Math.abs(accel.z / 163.84), 100)}%`, background: '#2196f3' }}></div>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div className="control-panel glass">
-                <h3>Arm Manipulator</h3>
-                <div className="sliders">
-                    {Object.entries(armValues).map(([joint, val]) => (
-                        <div key={joint} className="slider-group">
-                            <label>{joint.charAt(0).toUpperCase() + joint.slice(1)}</label>
-                            <input
-                                type="range"
-                                min="0"
-                                max={joint === 'gripper' ? 100 : 180}
-                                value={val}
-                                onChange={(e) => handleSliderChange(joint, parseInt(e.target.value))}
-                            />
-                            <span className="slider-val">{val}</span>
-                        </div>
-                    ))}
+                <div className="accel-footer">
+                    <span className="live-tag">● REAL-TIME DATA</span>
+                    <span className="timestamp">{telemetry?.timestamp ? new Date(telemetry.timestamp).toLocaleTimeString() : '--:--:--'}</span>
                 </div>
             </div>
         </div>

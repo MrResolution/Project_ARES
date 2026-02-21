@@ -17,7 +17,7 @@ const StatCard = ({ title, value, unit, trend, trendValue, icon, status }) => {
             </div>
             <div className="stat-body">
                 <div className="stat-value">
-                    {value !== null ? value : '--'}
+                    {value !== null && value !== undefined ? value : '---'}
                     <span className="stat-unit">{unit}</span>
                 </div>
                 {trend && (

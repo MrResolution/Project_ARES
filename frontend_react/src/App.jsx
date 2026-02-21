@@ -25,18 +25,23 @@ const API_URL = "http://localhost:5000/api";
 
 function App() {
   const [telemetry, setTelemetry] = useState(null);
-  const [history, setHistory] = useState({ temp: [], gas: [], rad: [], pressure: [] });
+  const [history, setHistory] = useState({ temp: [], gas: [], rad: [], pressure: [], flame: [], water: [] });
   const [activeMetric, setActiveMetric] = useState('temp');
   const [systemStatus, setSystemStatus] = useState('OFFLINE');
   const [gasProfile, setGasProfile] = useState(null);
+  const [objects, setObjects] = useState([]);
 
   const fetchTelemetry = async () => {
     try {
       const res = await fetch(`${API_URL}/status`);
       const data = await res.json();
 
-      setSystemStatus('ONLINE');
+      setSystemStatus(data.active ? 'ONLINE' : 'OFFLINE');
       setTelemetry(data);
+      setObjects(data.objects || []);
+      if (data.gasProfile) {
+        setGasProfile(data.gasProfile);
+      }
 
       // Map gas profile from API (or fallback if API hasn't implemented it yet)
       setGasProfile({
@@ -55,10 +60,11 @@ function App() {
 
       setHistory(prev => {
         const newHistory = { ...prev };
-        ['temp', 'gas', 'radiation', 'pressure'].forEach(key => {
-          const val = data[key === 'rad' ? 'radiation' : key];
+        ['temp', 'gas', 'radiation', 'pressure', 'flame', 'water'].forEach(key => {
+          const val = data[key];
           if (val !== undefined) {
-            newHistory[key === 'radiation' ? 'rad' : key] = [...prev[key === 'radiation' ? 'rad' : key], val].slice(-30);
+            const historyKey = key === 'radiation' ? 'rad' : key;
+            newHistory[historyKey] = [...(prev[historyKey] || []), val].slice(-30);
           }
         });
         return newHistory;
@@ -90,11 +96,12 @@ function App() {
                   activeMetric={activeMetric}
                   setActiveMetric={setActiveMetric}
                   gasProfile={gasProfile}
+                  systemStatus={systemStatus}
                 />
               }
             />
-            <Route path="/visuals" element={<VisualsPage />} />
-            <Route path="/controls" element={<ControlsPage />} />
+            <Route path="/visuals" element={<VisualsPage objects={objects} />} />
+            <Route path="/controls" element={<ControlsPage telemetry={telemetry} />} />
             <Route path="/assistant" element={<AssistantPage />} />
           </Routes>
         </ContentMain>
