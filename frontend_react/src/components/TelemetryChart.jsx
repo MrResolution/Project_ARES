@@ -44,7 +44,7 @@ const TelemetryChart = ({ data, activeMetric, onMetricChange, gasProfile, pressu
         setGradient(grad);
     }, [activeMetric]);
 
-    const lineData = {
+    const lineData = React.useMemo(() => ({
         labels: data.map((_, i) => i + 1), // Dynamic label population up to 30
         datasets: [
             {
@@ -59,9 +59,9 @@ const TelemetryChart = ({ data, activeMetric, onMetricChange, gasProfile, pressu
                 tension: 0.4,
             },
         ],
-    };
+    }), [data]);
 
-    const lineOptions = {
+    const lineOptions = React.useMemo(() => ({
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
@@ -90,9 +90,9 @@ const TelemetryChart = ({ data, activeMetric, onMetricChange, gasProfile, pressu
             },
         },
         animation: { duration: 500 },
-    };
+    }), []);
 
-    const radarData = {
+    const radarData = React.useMemo(() => ({
         labels: [
             'CO₂', 'NH₃', 'Benzene', 'Smoke',
             'Alcohol', 'NOx', 'CO', 'CH₄',
@@ -122,9 +122,9 @@ const TelemetryChart = ({ data, activeMetric, onMetricChange, gasProfile, pressu
                 borderWidth: 2,
             },
         ],
-    };
+    }), [gasProfile]);
 
-    const radarOptions = {
+    const radarOptions = React.useMemo(() => ({
         responsive: true,
         maintainAspectRatio: false,
         scales: {
@@ -153,7 +153,7 @@ const TelemetryChart = ({ data, activeMetric, onMetricChange, gasProfile, pressu
             },
         },
         animation: { duration: 500 },
-    };
+    }), []);
 
     // Pressure gauge
     const pressureVal = pressure || 0;

@@ -52,7 +52,7 @@ const GasRadarChart = ({ gasData }) => {
         gasData.hydrogen || 0,
     ] : Array(11).fill(0);
 
-    const data = {
+    const data = React.useMemo(() => ({
         labels: labels,
         datasets: [
             {
@@ -67,9 +67,9 @@ const GasRadarChart = ({ gasData }) => {
                 borderWidth: 2,
             },
         ],
-    };
+    }), [dataValues]);
 
-    const options = {
+    const options = React.useMemo(() => ({
         responsive: true,
         maintainAspectRatio: false,
         scales: {
@@ -109,7 +109,7 @@ const GasRadarChart = ({ gasData }) => {
                 borderWidth: 1
             }
         }
-    };
+    }), []);
 
     return (
         <div className="gas-radar-container glass">

@@ -62,12 +62,9 @@ function App() {
       setSystemStatus(data.active ? 'ONLINE' : 'OFFLINE');
       setTelemetry(data);
       setObjects(data.objects || []);
-      if (data.gasProfile) {
-        setGasProfile(data.gasProfile);
-      }
 
-      // Map gas profile from API (or fallback if API hasn't implemented it yet)
-      setGasProfile({
+      // Consolidated gas Profile logic to avoid double-renders
+      const mappedGasProfile = data.gasProfile || {
         ammonia: data.ammonia || (Math.random() * 20),
         nitrogen: data.nitrogen || (Math.random() * 80),
         oxygen: data.oxygen || (18 + Math.random() * 5),
@@ -79,7 +76,8 @@ function App() {
         sulfur: data.sulfur || (Math.random() * 8),
         methane: data.methane || (Math.random() * 10),
         hydrogen: data.hydrogen || (Math.random() * 5),
-      });
+      };
+      setGasProfile(mappedGasProfile);
 
       setHistory(prev => {
         const newHistory = { ...prev };
